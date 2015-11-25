@@ -31,7 +31,7 @@ install:
   - catkin_init_workspace $CATKIN_WS_UNDERLAY_SRC
   - cd $CATKIN_WS_UNDERLAY
   - catkin_make -DCMAKE_BUILD_TYPE=Release # build empty underlay
-  - catkin_make -DCMAKE_BUILD_TYPE=Release install# install empty underlay
+  - catkin_make -DCMAKE_BUILD_TYPE=Release install # install empty underlay
   - source $CATKIN_WS_UNDERLAY/devel/setup.bash # source empty underlay 
   - echo $ROS_PACKAGE_PATH
 
