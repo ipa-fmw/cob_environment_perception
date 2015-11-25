@@ -46,11 +46,11 @@ script:
   
   # create empty overlay workspace
   - mkdir -p $CATKIN_WS_SRC
+  - cd $CATKIN_WS
   - catkin_init_workspace $CATKIN_WS_SRC
   - source $CATKIN_WS_UNDERLAY/install/setup.bash # source install space of underlay
   - catkin_make -DCMAKE_BUILD_TYPE=Release # build empty overlay
   # populate overlay
-  - cd $CATKIN_WS
   - ln -s $TRAVIS_BUILD_DIR $CATKIN_WS_SRC
   # install dependencies from overlay
   - rosdep install -q --from-paths $CATKIN_WS_SRC -i -y --rosdistro $CI_ROS_DISTRO > /dev/null
