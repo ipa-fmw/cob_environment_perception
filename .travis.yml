@@ -30,9 +30,8 @@ install:
   - mkdir -p $CATKIN_WS_UNDERLAY_SRC
   - catkin_init_workspace $CATKIN_WS_UNDERLAY_SRC
   - cd $CATKIN_WS_UNDERLAY
-  - catkin_make -DCMAKE_BUILD_TYPE=Release # build empty underlay
-  - catkin_make -DCMAKE_BUILD_TYPE=Release install # install empty underlay
-  - source $CATKIN_WS_UNDERLAY/devel/setup.bash # source empty underlay 
+  - catkin_make -DCMAKE_BUILD_TYPE=Release install # build and install empty underlay
+  - source $CATKIN_WS_UNDERLAY/install/setup.bash # source empty underlay 
   - echo $ROS_PACKAGE_PATH
 
   # populate underlay
@@ -41,7 +40,6 @@ install:
   - rosdep install -q --from-paths src -i -y --rosdistro $CI_ROS_DISTRO > /dev/null # install deps from underlay
   - catkin_make -DCMAKE_BUILD_TYPE=Release # build underlay
   - catkin_make -DCMAKE_BUILD_TYPE=Release install > /dev/null # install underlay
-  - source $CATKIN_WS_UNDERLAY/install/setup.bash # source populated underlay
   - echo $ROS_PACKAGE_PATH
 
 script:
