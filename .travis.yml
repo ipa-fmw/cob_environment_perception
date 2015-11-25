@@ -25,10 +25,10 @@ install:
   - rosdep update
 
   # create empty underlay workspace
-  - cd $CATKIN_WS_UNDERLAY
   - mkdir -p $CATKIN_WS_UNDERLAY_SRC
   - catkin_init_workspace $CATKIN_WS_UNDERLAY_SRC
   # populate underlay
+  - cd $CATKIN_WS_UNDERLAY
   - if [ -f $TRAVIS_BUILD_DIR/.travis.rosinstall ]; then wstool init -j10 src $TRAVIS_BUILD_DIR/.travis.rosinstall; fi
   - if [ ! -f $TRAVIS_BUILD_DIR/.travis.rosinstall ]; then wstool init -j10 src $DEFAULT_ROSINSTALL; fi
   # install dependencies from underlay
@@ -44,10 +44,10 @@ script:
   - set -e
   
   # create empty overlay workspace
-  - cd $CATKIN_WS
   - mkdir -p $CATKIN_WS_SRC
   - catkin_init_workspace $CATKIN_WS_SRC
   # populate overlay
+  - cd $CATKIN_WS
   - ln -s $TRAVIS_BUILD_DIR $CATKIN_WS_SRC
   # install dependencies from overlay
   - source $CATKIN_WS_UNDERLAY/install/setup.bash # source install space of underlay
