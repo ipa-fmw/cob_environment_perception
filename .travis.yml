@@ -4,6 +4,7 @@ dist: trusty
 language: generic
 compiler:
   - gcc
+
 env:
   global:
     - CATKIN_WS=~/catkin_ws
@@ -13,6 +14,7 @@ env:
     - CI_ROS_DISTRO="indigo"
     - ROS_PARALLEL_JOBS=-j1
     - DEFAULT_ROSINSTALL="https://raw.githubusercontent.com/ipa320/care-o-bot/${CI_ROS_DISTRO}_dev/.travis.rosinstall"
+
 install:
   - sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu trusty main" > /etc/apt/sources.list.d/ros-latest.list'
   - wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
@@ -21,28 +23,36 @@ install:
   - sudo apt-get install -qq -y ros-${CI_ROS_DISTRO}-ros #needed as long as https://github.com/ros-infrastructure/rosdep/issues/430 is not fixed
   - sudo rosdep init
   - rosdep update
-  - rosdep install -q --from-paths ./ -i -y --rosdistro $CI_ROS_DISTRO
-  - source /opt/ros/$CI_ROS_DISTRO/setup.bash
+  - source /opt/ros/$CI_ROS_DISTRO/setup.bash # source release
   - echo $ROS_PACKAGE_PATH
+
+  # create empty underlay
   - mkdir -p $CATKIN_WS_UNDERLAY_SRC
+  - catkin_init_workspace $CATKIN_WS_UNDERLAY_SRC
   - cd $CATKIN_WS_UNDERLAY
-  - catkin_make -DCMAKE_BUILD_TYPE=Release
-  - source $CATKIN_WS_UNDERLAY/devel/setup.bash
+  - catkin_make -DCMAKE_BUILD_TYPE=Release # build empty underlay
+  - catkin_make -DCMAKE_BUILD_TYPE=Release install# install empty underlay
+  - source $CATKIN_WS_UNDERLAY/devel/setup.bash # source empty underlay 
   - echo $ROS_PACKAGE_PATH
-script:
-  - set -e
+
+  # populate underlay
   - if [ -f $TRAVIS_BUILD_DIR/.travis.rosinstall ]; then wstool init -j10 src $TRAVIS_BUILD_DIR/.travis.rosinstall; fi
   - if [ ! -f $TRAVIS_BUILD_DIR/.travis.rosinstall ]; then wstool init -j10 src $DEFAULT_ROSINSTALL; fi
-  - rosdep install -q --from-paths src -i -y > /dev/null
-  - catkin_make -DCMAKE_BUILD_TYPE=Release
-  - catkin_make -DCMAKE_BUILD_TYPE=Release install > /dev/null
-  - source $CATKIN_WS_UNDERLAY/install/setup.bash
+  - rosdep install -q --from-paths src -i -y --rosdistro $CI_ROS_DISTRO > /dev/null # install deps from underlay
+  - catkin_make -DCMAKE_BUILD_TYPE=Release # build underlay
+  - catkin_make -DCMAKE_BUILD_TYPE=Release install > /dev/null # install underlay
+  - source $CATKIN_WS_UNDERLAY/install/setup.bash # source populated underlay
   - echo $ROS_PACKAGE_PATH
+
+script:
+  - set -e
+  
+  # overlay
   - mkdir -p $CATKIN_WS_SRC
   - ln -s $TRAVIS_BUILD_DIR $CATKIN_WS_SRC
-  - cd $CATKIN_WS_SRC
-  - catkin_init_workspace
+  - catkin_init_workspace $CATKIN_WS_SRC
   - cd $CATKIN_WS
-  - catkin_make -DCMAKE_BUILD_TYPE=Release
-  - catkin_make run_tests
+  - rosdep install -q --from-paths ./ -i -y --rosdistro $CI_ROS_DISTRO > /dev/null # install deps from overlay
+  - catkin_make -DCMAKE_BUILD_TYPE=Release # build overlay
+  - catkin_make run_tests # test overlay
   - catkin_test_results --verbose
