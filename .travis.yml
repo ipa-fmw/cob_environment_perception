@@ -50,9 +50,9 @@ script:
   # populate overlay
   - ln -s $TRAVIS_BUILD_DIR $CATKIN_WS_SRC
   # install dependencies from overlay
-  - rosdep install -q --from-paths ./ -i -y --rosdistro $CI_ROS_DISTRO > /dev/null
-  # build overlay
   - source $CATKIN_WS_UNDERLAY/install/setup.bash # source install space of underlay
+  - rosdep install -q --from-paths $CATKIN_WS_SRC -i -y --rosdistro $CI_ROS_DISTRO > /dev/null
+  # build overlay
   - catkin_make -DCMAKE_BUILD_TYPE=Release
   - catkin_make run_tests # test overlay
   - catkin_test_results --verbose
