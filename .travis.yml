@@ -23,10 +23,12 @@ install:
   - rosdep update
   - rosdep install -q --from-paths ./ -i -y --rosdistro $CI_ROS_DISTRO
   - source /opt/ros/$CI_ROS_DISTRO/setup.bash
+  - echo $ROS_PACKAGE_PATH
   - mkdir -p $CATKIN_WS_UNDERLAY_SRC
   - cd $CATKIN_WS_UNDERLAY
   - catkin_make -DCMAKE_BUILD_TYPE=Release
   - source $CATKIN_WS_UNDERLAY/devel/setup.bash
+  - echo $ROS_PACKAGE_PATH
 script:
   - set -e
   - if [ -f $TRAVIS_BUILD_DIR/.travis.rosinstall ]; then wstool init -j10 src $TRAVIS_BUILD_DIR/.travis.rosinstall; fi
@@ -35,6 +37,7 @@ script:
   - catkin_make -DCMAKE_BUILD_TYPE=Release
   - catkin_make -DCMAKE_BUILD_TYPE=Release install > /dev/null
   - source $CATKIN_WS_UNDERLAY/install/setup.bash
+  - echo $ROS_PACKAGE_PATH
   - mkdir -p $CATKIN_WS_SRC
   - ln -s $TRAVIS_BUILD_DIR $CATKIN_WS_SRC
   - cd $CATKIN_WS_SRC
